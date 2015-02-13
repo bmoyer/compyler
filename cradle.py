@@ -31,21 +31,25 @@ def match(x):
         expected('\'\'' + x + '\'\'')
 
 def get_num():
+    value = ''
     try:
         int(look)
     except:
         expected('Integer')
-    old_look = look
-    get_char()
-    return old_look
+
+    while look.isdigit():
+        value = value + look
+        get_char()
+    return value
 
 def get_name():
+    token = ''
     if look.isalpha():
-        old_look = look
-        get_char()
-        return old_look.upper()
+        while look.isalnum():
+            token = token + look.upper()
+            get_char()
+        return token
     else:
-        print "err " + look
         expected('Name')
 
 def factor():
