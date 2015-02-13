@@ -14,6 +14,10 @@ def abort(s):
 def expected(s):
     abort(s + ' expected')
 
+def skip_white():
+    while look.isspace():
+        get_char()
+
 def get_char():
     global idx
     global look
@@ -27,6 +31,7 @@ def initialize():
 def match(x):
     if look == x:
         get_char()
+        skip_white()
     else:
         expected('\'\'' + x + '\'\'')
 
@@ -40,6 +45,7 @@ def get_num():
     while look.isdigit():
         value = value + look
         get_char()
+    skip_white()
     return value
 
 def get_name():
@@ -48,6 +54,7 @@ def get_name():
         while look.isalnum():
             token = token + look.upper()
             get_char()
+        skip_white()
         return token
     else:
         expected('Name')
