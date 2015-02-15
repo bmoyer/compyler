@@ -36,14 +36,16 @@ def match(x):
         expected('\'\'' + x + '\'\'')
 
 def get_num():
-    value = ''
+    value = 0
     try:
         int(look)
     except:
+        print "look was", look
         expected('Integer')
-    old_look = look
-    get_char()
-    return int(old_look) - int('0')
+    while look.isdigit():
+        value = 10 * value + int(look) - int('0')
+        get_char()
+    return value 
 
 def get_name():
     token = ''
@@ -58,13 +60,14 @@ def get_name():
 
 def factor():
     if look == '(':
+        print "found left paren"
         match('(')
-        expression()
+        expr = expression()
+        print "expr was ",expr
         match(')')
-    elif look.isalpha():
-        ident()
+        return expr
     else:
-        print('MOVE #' + get_num() + ',D0')
+        return get_num()
 
 def ident():
     name = get_name()
@@ -98,29 +101,33 @@ def divide():
     print('DIVS D1,D0')
 
 def term():
-    factor()
+    value = factor() 
     while look in ['*','/']:
-        print('MOVE D0,-(SP)')
+        prev_look = look
         if look == '*':
-            multiply()
-        elif look == '/':
-            divide()
-        else:
-            expected('MulOp')
+            match('*')
+            value = value * factor() 
+        if look == '/':
+            match('/')
+            value = value / factor() 
+    return value
 
 def expression():
     if is_add_op(look):
         value = 0
     else:
-        value = get_num()
+        value = factor()
     while is_add_op(look):
         if look == '+':
             match('+')
-            value = value + get_num()
+            n = term()
+            value = value + n
+            print "n was ", n
         if look == ('-'):
             match('-')
-            n = get_num()
+            n = term()
             value = value - n
+            print "n was ", n
     return value
 
 def assignment():
