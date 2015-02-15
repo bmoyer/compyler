@@ -2,8 +2,8 @@
 
 import collections
 import string
+import sys
 
-stream = raw_input()
 idx = 0
 look = ""
 table = collections.defaultdict(int)
@@ -22,12 +22,25 @@ def skip_white():
     while look.isspace():
         get_char()
 
+def new_line():
+    if look == ';':
+        get_char()
+
 def get_char():
     global idx
     global look
     look = stream[idx]
     if idx < (len(stream)-1):
         idx += 1
+
+def get_input():
+    match('?')
+    global table
+    table[get_name()] = raw_input()
+
+def output():
+    match('!')
+    print table[get_name()]
 
 def initialize():
     init_table()
@@ -110,7 +123,7 @@ def divide():
     print('DIVS D1,D0')
 
 def term():
-    value = factor() 
+    value = int(factor())
     while look in ['*','/']:
         if look == '*':
             match('*')
@@ -140,10 +153,29 @@ def expression():
 def assignment():
     name = get_name()
     match('=')
-    expression()
-    print('LEA ' + name + '(PC),A0')
-    print('MOVE D0,(A0)')
+    global table
+    table[name] = expression()
 
-initialize()
-print expression()
-if(look != stream[-1]): expected('Newline')
+def interpret():
+    initialize()
+    while True:
+        if look == "?":
+            get_input()
+        elif look == "!":
+            output()
+        else:
+            assignment()
+        new_line()
+        if look == ";":
+            break
+
+if __name__ == '__main__':
+    global stream
+    
+    if len(sys.argv) == 1:
+        stream = raw_input()
+    else:
+        with open(sys.argv[1], 'r') as infile:
+            stream = infile.read().replace('\n', '')
+
+    interpret()
