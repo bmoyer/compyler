@@ -123,15 +123,15 @@ def divide():
     print('DIVS D1,D0')
 
 def term():
-    value = int(factor())
+    value = factor()
     while look in ['*','/']:
         if look == '*':
             match('*')
-            value = value * factor() 
+            value = int(value) * int(factor())
         if look == '/':
             match('/')
-            value = value / factor() 
-    return value
+            value = int(value) / int(factor())
+    return int(value)
 
 def expression():
     value = 0
@@ -148,7 +148,7 @@ def expression():
             match('-')
             n = term()
             value = value - n
-    return value
+    return int(value)
 
 def assignment():
     name = get_name()
