@@ -40,7 +40,6 @@ def get_num():
     try:
         int(look)
     except:
-        print "look was", look
         expected('Integer')
     while look.isdigit():
         value = 10 * value + int(look) - int('0')
@@ -60,10 +59,8 @@ def get_name():
 
 def factor():
     if look == '(':
-        print "found left paren"
         match('(')
         expr = expression()
-        print "expr was ",expr
         match(')')
         return expr
     else:
@@ -103,7 +100,6 @@ def divide():
 def term():
     value = factor() 
     while look in ['*','/']:
-        prev_look = look
         if look == '*':
             match('*')
             value = value * factor() 
@@ -113,21 +109,20 @@ def term():
     return value
 
 def expression():
+    value = 0
     if is_add_op(look):
         value = 0
     else:
-        value = factor()
+        value = term()
     while is_add_op(look):
         if look == '+':
             match('+')
             n = term()
             value = value + n
-            print "n was ", n
         if look == ('-'):
             match('-')
             n = term()
             value = value - n
-            print "n was ", n
     return value
 
 def assignment():
