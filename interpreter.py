@@ -1,8 +1,12 @@
 #!/usr/local/bin/python
 
+import collections
+import string
+
 stream = raw_input()
 idx = 0
 look = ""
+table = collections.defaultdict(int)
 
 def is_add_op(s):
     return s in ['+','-']
@@ -26,7 +30,13 @@ def get_char():
         idx += 1
 
 def initialize():
+    init_table()
     get_char()
+
+def init_table():
+    global table
+    for char in string.ascii_uppercase:
+        table[char] = 0
 
 def match(x):
     if look == x:
@@ -63,6 +73,8 @@ def factor():
         expr = expression()
         match(')')
         return expr
+    elif look.isalpha():
+        return table[get_name()]
     else:
         return get_num()
 
