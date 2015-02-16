@@ -159,12 +159,27 @@ def do_if():
     match('e')
     post_label(l2)
 
+def do_while():
+    match('w')
+    l1 = new_label()
+    l2 = new_label()
+    post_label(l1)
+    condition()
+    print 'BEQ ' + l2
+    block()
+    match('e')
+    print 'BRA ' + l1
+    post_label(l2)
+
 def block():
     while not (look in ['e', 'l']):
         #print "look was ", look
         old_look = look
         if old_look == 'i':
             do_if()
+            continue
+        if old_look == 'w':
+            do_while()
             continue
         else: 
             other()
