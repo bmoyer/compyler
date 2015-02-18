@@ -1,12 +1,47 @@
 #!/usr/local/bin/python
 
-stream = raw_input()
+import sys    
+
+class Symbol : str
+
+class SymType:
+    IfSym = 0
+    ElseSym = 1
+    EndifSym = 2
+    EndSym = 3
+    Ident = 4
+    Number = 5
+    Operator = 6
+
+sym_table = list()
+
+keywords = ['IF','ELSE','ENDIF','END']
+
 idx = 0
 look = ""
-token = ''
+token = -1
+
+def lookup(table, string):
+    found = False
+    i = len(table) - 1
+    while(i > 0) and not found:
+        if string == table[i]:
+            found = True
+        else:
+            i -= 1
+    return i
+
+
+def get_lines():
+    stop = ''
+    s = '\n'.join(iter(raw_input, stop))
+    return s
 
 def is_add_op(s):
     return s in ['+','-']
+
+def is_op(c):
+    return c in ['+','-','*','/','<','>',':','=']
 
 def abort(s):
     print s
@@ -19,12 +54,31 @@ def skip_white():
     while look.isspace():
         get_char()
 
+def skip_comma():
+    skip_white()
+    if look == ',':
+        get_char()
+        skip_white()
+
 def get_char():
     global idx
     global look
     look = stream[idx]
     if idx < (len(stream)-1):
         idx += 1
+
+def get_op():
+    value = ''
+    if not is_op(look):
+        expected('operator')
+    while is_op(look):
+        value += look
+        get_char()
+    if len(value) == 1:
+        return value
+    else:
+        return value
+        #return '?'
 
 def initialize():
     get_char()
@@ -61,6 +115,8 @@ def scan():
         tok = get_name()
     elif look.isdigit():
         tok = get_num()
+    elif is_op(look):
+        tok = get_op()
     else:
         tok = look
         get_char()
@@ -140,13 +196,10 @@ def assignment():
     print('LEA ' + name + '(PC),A0')
     print('MOVE D0,(A0)')
 
+stream = get_lines() 
 initialize()
 while True:
-    token = scan()
-    print token
-    if token == ';':
+    tok = scan()
+    print tok
+    if tok == ';':
         break
-#expression()
-#assignment()
-#print get_name()
-#if(look != stream[-1]): expected('Newline')
