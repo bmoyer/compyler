@@ -25,6 +25,7 @@ idx = 0
 look = ""
 token = -1
 value = ''
+KWcode = 'xilee'
 
 def lookup(table, string):
     try:
@@ -91,7 +92,11 @@ def get_op():
     while is_op(look):
         value += look
         get_char()
-    token = SymType.Operator
+    if len(value) == 1:
+        token = value[0]
+    else:
+        token = '?'
+
 
 def initialize():
     get_char()
@@ -112,7 +117,7 @@ def get_num():
     while look.isdigit():
         value += look
         get_char()
-    token = SymType.Number
+    token = '#'
 
 def get_name():
     global value
@@ -123,11 +128,7 @@ def get_name():
     while look.isalnum():
         value += look.upper()
         get_char()
-    k = lookup(Symbols, value)
-    if k == 0:
-        token = SymType.Ident
-    else:
-        token = Symbols[k-1]
+    token = KWcode[lookup(Symbols, value)]
 
 def scan():
     global value
@@ -140,7 +141,7 @@ def scan():
         get_op()
     else:
         value = look
-        token = SymType.Operator
+        token = '?'
         get_char()
     skip_white()
 
@@ -223,16 +224,15 @@ stream = get_lines()
 initialize()
 while True:
     scan()
-    if token == SymType.Ident:
+    if token == 'x':
         print 'Ident '
-    elif token == SymType.Number:
+    elif token == '#':
         print 'Number '
-    elif token == SymType.Operator:
-        print 'Operator '
-    elif token == SymType.EndSym:
-        break
-    elif value == "END":
-        break
-    else:
+    elif token in ['i','l','e']:
         print 'Keyword '
+    else:
+        print 'Operator '
     print value
+
+    if value == 'END':
+        break
