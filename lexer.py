@@ -75,22 +75,23 @@ def skip_comma():
 def get_char():
     global idx
     global look
-    look = stream[idx]
-    if idx < (len(stream)-1):
-        idx += 1
+    try:
+        look = stream[idx]
+    except:
+        look = ''
+    #if idx < (len(stream)-1):
+    idx += 1
 
 def get_op():
+    global value
+    global token
     value = ''
     if not is_op(look):
         expected('operator')
     while is_op(look):
         value += look
         get_char()
-    if len(value) == 1:
-        return value
-    else:
-        return value
-        #return '?'
+    token = SymType.Operator
 
 def initialize():
     get_char()
@@ -103,45 +104,40 @@ def match(x):
         expected('\'\'' + x + '\'\'')
 
 def get_num():
-    x = ''
+    global value
+    global token
+    value = ''
     if not look.isdigit():
         expected('Integer')
     while look.isdigit():
-        x += look
+        value += look
         get_char()
-    skip_white()
-    return x
+    token = SymType.Number
 
 def get_name():
-    x = ''
+    global value
+    global token
+    value = ''
     if not look.isalpha():
-        print "LOOK WAS ",look
         expected('name')
     while look.isalnum():
-        x += look.upper()
+        value += look.upper()
         get_char()
-    skip_white()
-    return x
+    k = lookup(Symbols, value)
+    if k == 0:
+        token = SymType.Ident
+    else:
+        token = Symbols[k-1]
 
 def scan():
     global value
     global token
     if look.isalpha():
-        value = get_name()
-        k = lookup(Symbols, value)
-        if k == 0:
-            token = SymType.Ident
-        else:
-            token = Symbols[k-1]
+        get_name()
     elif look.isdigit():
-        value = get_num()
-        token = SymType.Number
+        get_num()
     elif is_op(look):
-        value = get_op()
-        token = SymType.Operator
-    elif look == ';':
-        get_char()
-        token = SymType.EndSym;
+        get_op()
     else:
         value = look
         token = SymType.Operator
@@ -234,6 +230,8 @@ while True:
     elif token == SymType.Operator:
         print 'Operator '
     elif token == SymType.EndSym:
+        break
+    elif value == "END":
         break
     else:
         print 'Keyword '
